@@ -2,7 +2,7 @@ import sqlite3
 from flask import g
 import os
 
-DATABASE = 'XWines_Relational1.db'
+DATABASE = 'XWines.db'
 
 def get_db():
     """Conecta à base de dados e garante que retorna linhas como dicionários."""

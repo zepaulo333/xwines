@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XWines - Adegas e Vinhos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: '#722F37',
+                        'wine-dark': '#4a1a21',
+                        gold: '#c5a059',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navegação Premium -->
+    <nav class="glass-dark text-white fixed w-full top-0 z-50 shadow-lg transition-all duration-300">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-2xl font-serif font-bold tracking-wide flex items-center gap-3 group">
+                    <span class="bg-white/10 p-2 rounded-lg group-hover:bg-wine transition-colors">
+                        <i class="fas fa-wine-glass text-gold"></i>
+                    </span>
+                    <span>XWines<span class="text-gold">.db</span></span>
+                </a>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="text-sm uppercase tracking-widest hover:text-gold transition relative group">
+                        Início
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gold transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="/queries" class="text-sm uppercase tracking-widest hover:text-gold transition relative group">
+                        Estatísticas
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gold transition-all group-hover:w-full"></span>
+                    </a>
+                    <!-- NOVO BOTÃO IA -->
+                    <a href="/ai-sommelier" class="text-sm uppercase tracking-widest text-gold font-bold border border-gold/50 px-4 py-2 rounded-full hover:bg-gold hover:text-slate-900 transition shadow-lg shadow-gold/10 flex items-center gap-2">
+                        <i class="fas fa-robot"></i> Sommelier IA
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <a href="/ai-sommelier" class="md:hidden text-gold text-xl">
+                    <i class="fas fa-robot"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Espaçador para a Nav Fixa -->
+    <div class="h-20"></div>
+
+    <!-- Conteúdo Principal com Animação -->
+    <main class="flex-grow container mx-auto px-4 py-10 animate-fade-in">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-white border-t border-gray-200 py-8 mt-auto">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex justify-center items-center gap-2 mb-2 text-wine">
+                <i class="fas fa-leaf"></i>
+                <span class="font-serif font-bold text-lg">XWines Project</span>
+            </div>
+            <p class="text-sm text-slate-500">Projeto Bases de Dados</p>
+        </div>
+    </footer>
+
+</body>
+</html>

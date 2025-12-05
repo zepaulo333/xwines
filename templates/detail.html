@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Navegação -->
+    <div class="flex items-center justify-between mb-8">
+        <nav class="flex items-center text-sm font-medium text-slate-500">
+            <a href="/" class="hover:text-wine transition"><i class="fas fa-home mr-1"></i> Início</a>
+            <i class="fas fa-chevron-right mx-3 text-xs opacity-50"></i>
+            <a href="/{{ table_name }}/" class="hover:text-wine transition">{{ table_name }}</a>
+            <i class="fas fa-chevron-right mx-3 text-xs opacity-50"></i>
+            <span class="text-wine font-bold bg-pink-50 px-2 py-0.5 rounded">#{{ item[pk] }}</span>
+        </nav>
+        
+        <a href="javascript:history.back()" class="text-sm font-bold text-slate-500 hover:text-wine transition flex items-center gap-2">
+            <i class="fas fa-long-arrow-alt-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Ficha Principal -->
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 mb-10">
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-8 md:p-10 relative overflow-hidden text-white">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-wine rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-16 -mt-16 animate-pulse"></div>
+            
+            <div class="relative z-10">
+                <span class="text-gold font-bold tracking-widest text-xs uppercase mb-2 block border-b border-gold/30 pb-2 w-max">Dados do Registo</span>
+                <h1 class="text-4xl md:text-5xl font-serif font-bold mb-2">{{ table_name }}</h1>
+                
+                <!-- Tenta encontrar um nome para mostrar no título -->
+                {% set main_name = None %}
+                {% for k in item.keys() %}
+                    {% if 'Name' in k or 'Country' in k %}{% set main_name = item[k] %}{% endif %}
+                {% endfor %}
+                
+                {% if main_name %}
+                    <p class="text-2xl text-slate-200 font-serif italic mt-2">{{ main_name }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="p-8 md:p-10 bg-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                {% for key in item.keys() %}
+                    {% set value = item[key] %}
+                    <div class="group border-b border-gray-100 pb-3">
+                        <span class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ key }}</span>
+                        <div class="text-lg font-medium text-slate-800 break-words">
+                            {% if key == 'Website' and value %}
+                                <a href="{{ value }}" target="_blank" class="text-wine hover:underline flex items-center gap-2">
+                                    {{ value }} <i class="fas fa-external-link-alt text-xs"></i>
+                                </a>
+                            {% elif key.endswith('ID') and key != pk and value %}
+                                {% set ref_table = key[:-2] %}
+                                <div class="flex items-center justify-between">
+                                    <span>{{ value }}</span>
+                                    <a href="/{{ ref_table }}/{{ value }}/" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full hover:bg-wine hover:text-white transition">
+                                        Ver {{ ref_table }} <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Relações (Tabelas Filhas) -->
+    {% if relations %}
+        <div class="space-y-8">
+            <div class="flex items-center gap-4">
+                <div class="h-px flex-grow bg-gray-300"></div>
+                <h2 class="text-2xl font-serif font-bold text-slate-800">Dados Relacionados</h2>
+                <div class="h-px flex-grow bg-gray-300"></div>
+            </div>
+
+            {% for rel_name, rel_info in relations.items() %}
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                <div class="bg-slate-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-wine flex items-center gap-2">
+                        <i class="fas fa-link text-gold"></i> {{ rel_name }}
+                    </h3>
+                    <span class="bg-white border border-gray-200 text-xs font-bold px-2 py-1 rounded text-slate-500">
+                        {{ rel_info.data|length }} registos
+                    </span>
+                </div>
+                
+                {% if rel_info.data %}
+                    <div class="max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold uppercase text-xs sticky top-0 shadow-sm">
+                                <tr>
+                                    <th class="px-6 py-3">ID</th>
+                                    <th class="px-6 py-3">Valor</th>
+                                    <th class="px-6 py-3 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for row in rel_info.data %}
+                                <tr class="hover:bg-pink-50/30 transition">
+                                    <td class="px-6 py-3 font-mono text-gray-400">
+                                        {% if rel_info.pk in row.keys() %} #{{ row[rel_info.pk] }} {% else %} - {% endif %}
+                                    </td>
+                                    <td class="px-6 py-3 font-medium text-slate-700">
+                                        {# Tenta mostrar a coluna de display configurada, ou a primeira coluna disponível #}
+                                        {% if rel_info.display in row.keys() %}
+                                            {{ row[rel_info.display] }}
+                                        {% else %}
+                                            {{ row[0] }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-3 text-right">
+                                        {% if rel_info.pk in row.keys() %}
+                                        <a href="/{{ rel_name }}/{{ row[rel_info.pk] }}/" class="text-wine hover:text-gold font-bold text-xs">
+                                            Ver <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-6 text-center text-slate-400 italic">Sem dados encontrados.</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

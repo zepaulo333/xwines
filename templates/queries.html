@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="mb-10 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-slate-800 font-serif mb-2">Estatísticas <span class="text-wine">Avançadas</span></h1>
+            <p class="text-slate-500">Análise detalhada da base de dados com navegação integrada.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Menu Lateral -->
+        <div class="lg:col-span-4 space-y-2 sticky top-28">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
+                <h3 class="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-widest">Queries Disponíveis</h3>
+                {% for q_id, q_info in queries.items() %}
+                <a href="/queries/{{ q_id }}" 
+                   class="block p-4 rounded-xl transition duration-200 mb-1 group relative overflow-hidden {{ 'bg-wine text-white shadow-md' if active_id == q_id else 'hover:bg-slate-50 text-slate-600' }}">
+                    
+                    {% if active_id == q_id %}
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gold"></div>
+                    {% endif %}
+
+                    <div class="flex items-start gap-3 relative z-10">
+                        <span class="font-mono font-bold text-lg opacity-60 min-w-[24px]">#{{ q_id }}</span>
+                        <span class="font-semibold leading-snug text-sm">{{ q_info.title }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Área de Resultados -->
+        <div class="lg:col-span-8 min-h-[500px]">
+            {% if active_query %}
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in">
+                    <!-- Cabeçalho do Resultado -->
+                    <div class="p-6 border-b border-slate-100 bg-gradient-to-r from-gray-50 to-white">
+                        <h2 class="text-2xl font-serif font-bold text-slate-800 mb-4">{{ active_query.title }}</h2>
+                        
+                        <!-- Bloco de Código SQL -->
+                        <div class="bg-slate-900 rounded-lg p-4 shadow-inner overflow-x-auto border border-slate-700">
+                            <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase">SQL Statement</span>
+                                <i class="fas fa-database text-gray-600"></i>
+                            </div>
+                            <pre class="text-green-400 font-mono text-xs leading-relaxed whitespace-pre-wrap">{{ active_query.sql }}</pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabela de Dados -->
+                    {% if results %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead class="bg-slate-50 text-slate-500 font-bold border-b border-gray-200 uppercase text-xs sticky top-0 shadow-sm">
+                                <tr>
+                                    {% for key in results[0].keys() %}
+                                    <th class="px-6 py-4 whitespace-nowrap bg-slate-50">{{ key }}</th>
+                                    {% endfor %}
+                                    <th class="px-6 py-4 bg-slate-50 w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                {% for row in results %}
+                                    
+                                    {# Lógica para determinar o link da linha inteira #}
+                                    {% set row_link = None %}
+                                    {% if 'WineID' in row.keys() %}
+                                        {% set row_link = '/Wine/' ~ row['WineID'] ~ '/' %}
+                                    {% elif 'WineryID' in row.keys() %}
+                                        {% set row_link = '/Winery/' ~ row['WineryID'] ~ '/' %}
+                                    {% elif 'RegionID' in row.keys() %}
+                                        {% set row_link = '/Region/' ~ row['RegionID'] ~ '/' %}
+                                    {% elif 'Code' in row.keys() %}
+                                        {% set row_link = '/Countries/' ~ row['Code'] ~ '/' %}
+                                    {% endif %}
+
+                                <tr class="transition-colors group {{ 'hover:bg-pink-50 cursor-pointer' if row_link else 'hover:bg-slate-50' }}" 
+                                    {% if row_link %}onclick="window.location='{{ row_link }}'"{% endif %}>
+                                    
+                                    {% for key in row.keys() %}
+                                    <td class="px-6 py-4 text-slate-700 whitespace-nowrap border-r border-transparent group-hover:border-gray-100 last:border-0">
+                                        {# Destaque visual se for um ID #}
+                                        {% if key in ['WineID', 'WineryID', 'RegionID', 'Code'] %}
+                                            <span class="font-bold text-wine">#{{ row[key] }}</span>
+                                        {% else %}
+                                            {{ row[key] }}
+                                        {% endif %}
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    <!-- Seta Indicadora -->
+                                    <td class="px-6 py-4 text-right text-wine opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {% if row_link %}
+                                            <i class="fas fa-chevron-right"></i>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-right">
+                        <span class="text-xs font-bold text-slate-400 uppercase">{{ results|length }} Registos</span>
+                    </div>
+                    {% else %}
+                        <div class="p-16 text-center text-slate-400 flex flex-col items-center justify-center">
+                            <i class="fas fa-search text-3xl text-gray-300 mb-4"></i>
+                            <h3 class="text-lg font-medium text-slate-600">Sem resultados</h3>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <!-- Estado Vazio -->
+                <div class="h-full flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-gray-300 rounded-3xl bg-white/50 min-h-[400px]">
+                    <div class="w-20 h-20 bg-white rounded-full shadow-md flex items-center justify-center mb-6 text-gold">
+                        <i class="fas fa-chart-bar text-3xl animate-pulse"></i>
+                    </div>
+                    <h3 class="text-2xl font-serif font-bold text-slate-700 mb-2">Análise de Dados</h3>
+                    <p class="text-slate-500 max-w-md">
+                        Selecione uma das queries predefinidas no menu à esquerda para visualizar estatísticas detalhadas sobre a sua coleção de vinhos.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

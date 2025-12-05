@@ -7,7 +7,7 @@ from flask import Flask, render_template, abort, request, g, jsonify
 # ==============================================================================
 # ⚠️ CONFIGURAÇÃO OBRIGATÓRIA ⚠️
 # ==============================================================================
-GOOGLE_API_KEY = "AIzaSyCtZ5x54klmPxAsPo8KuS9PaDzGum0UgFA" 
+GOOGLE_API_KEY = "A_TUA_API_KEY_AQUI" 
 # ==============================================================================
 
 if GOOGLE_API_KEY and GOOGLE_API_KEY != "A_TUA_API_KEY_AQUI":
@@ -34,9 +34,9 @@ INVERSE_RELATIONS = {
     'Region': {'table': 'Wine', 'fk': 'RegionID', 'display': 'WineName'},
     'Countries': {'table': 'Region', 'fk': 'Code', 'display': 'RegionName'},
     'Wine': [
-        {'table': 'Grapes', 'fk': 'WineID', 'display': 'Grape'},      # Atualizado
+        {'table': 'Grapes', 'fk': 'WineID', 'display': 'Grape'},
         {'table': 'Harmonize', 'fk': 'WineID', 'display': 'Harmonize'},
-        {'table': 'Vintages', 'fk': 'WineID', 'display': 'Vintage'}   # Atualizado
+        {'table': 'Vintages', 'fk': 'WineID', 'display': 'Vintage'}
     ]
 }
 

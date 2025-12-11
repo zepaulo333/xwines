@@ -5,7 +5,7 @@ import google.generativeai as genai
 from flask import Flask, render_template, abort, request, g, jsonify
 
 
-GOOGLE_API_KEY = "AIzaSyDuaWG-YBYJ41TlAI1LSe50stdauAEHWkU" 
+GOOGLE_API_KEY = "A" 
 
 
 from db import get_db, close_connection, get_tables, get_primary_key

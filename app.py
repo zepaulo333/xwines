@@ -4,14 +4,9 @@ import sqlite3
 import google.generativeai as genai
 from flask import Flask, render_template, abort, request, g, jsonify
 
-# ==============================================================================
-# ⚠️ CONFIGURAÇÃO OBRIGATÓRIA ⚠️
-# ==============================================================================
-GOOGLE_API_KEY = "AIzaSyDuaWG-YBYJ41TlAI1LSe50stdauAEHWkU" 
-# ==============================================================================
 
-if GOOGLE_API_KEY and GOOGLE_API_KEY != "A_TUA_API_KEY_AQUI":
-    genai.configure(api_key=GOOGLE_API_KEY)
+GOOGLE_API_KEY = "AIzaSyDuaWG-YBYJ41TlAI1LSe50stdauAEHWkU" 
+
 
 from db import get_db, close_connection, get_tables, get_primary_key
 

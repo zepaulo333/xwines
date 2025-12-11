@@ -42,21 +42,36 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                 {% for key in item.keys() %}
                     {% set value = item[key] %}
-                    <div class="group border-b border-gray-100 pb-3">
+                    <div class="group border-b border-gray-100 pb-3 hover:border-pink-100 transition">
                         <span class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ key }}</span>
                         <div class="text-lg font-medium text-slate-800 break-words">
+                            
+                            {# 1. Links Web #}
                             {% if key == 'Website' and value %}
                                 <a href="{{ value }}" target="_blank" class="text-wine hover:underline flex items-center gap-2">
                                     {{ value }} <i class="fas fa-external-link-alt text-xs"></i>
                                 </a>
+                            
+                            {# 2. Chaves Estrangeiras Padrão (terminam em ID) #}
                             {% elif key.endswith('ID') and key != pk and value %}
                                 {% set ref_table = key[:-2] %}
                                 <div class="flex items-center justify-between">
                                     <span>{{ value }}</span>
-                                    <a href="/{{ ref_table }}/{{ value }}/" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full hover:bg-wine hover:text-white transition">
-                                        Ver {{ ref_table }} <i class="fas fa-arrow-right ml-1"></i>
+                                    <a href="/{{ ref_table }}/{{ value }}/" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full hover:bg-wine hover:text-white transition flex items-center gap-1">
+                                        Ver {{ ref_table }} <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
+
+                            {# 3. CASO ESPECIAL: Região -> País (Code) #}
+                            {% elif table_name == 'Region' and key == 'Code' %}
+                                <div class="flex items-center justify-between">
+                                     <span class="font-mono">{{ value }}</span>
+                                     <a href="/Countries/{{ value }}/" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full hover:bg-wine hover:text-white transition flex items-center gap-1">
+                                        <i class="fas fa-flag"></i> Ver País
+                                    </a>
+                                </div>
+
+                            {# 4. Texto Normal #}
                             {% else %}
                                 {{ value }}
                             {% endif %}
@@ -69,7 +84,7 @@
 
     <!-- Relações (Tabelas Filhas) -->
     {% if relations %}
-        <div class="space-y-8">
+        <div class="space-y-8 animate-fade-in">
             <div class="flex items-center gap-4">
                 <div class="h-px flex-grow bg-gray-300"></div>
                 <h2 class="text-2xl font-serif font-bold text-slate-800">Dados Relacionados</h2>
@@ -113,7 +128,7 @@
                                     </td>
                                     <td class="px-6 py-3 text-right">
                                         {% if rel_info.pk in row.keys() %}
-                                        <a href="/{{ rel_name }}/{{ row[rel_info.pk] }}/" class="text-wine hover:text-gold font-bold text-xs">
+                                        <a href="/{{ rel_name }}/{{ row[rel_info.pk] }}/" class="text-wine hover:text-gold font-bold text-xs inline-flex items-center gap-1">
                                             Ver <i class="fas fa-chevron-right"></i>
                                         </a>
                                         {% endif %}
